@@ -4,6 +4,31 @@
 # Ruff configuration
 [tool.ruff]
 line-length = 120
+ignore-init-module-imports = true
+
+[tool.ruff.lint]
+select = [
+    'F',    # PyFlakes
+    'E',    # pycodestyle
+    'W',    # pycodestyle
+    'C90',  # mccabe
+    'I',    # isort
+    'D',    # pydocstyle
+    'UP',   # pyupgrade
+    'ANN',  # flake8-annotations
+    'BLE',  # flake8-blind-except
+    'B',    # flake8-bugbear
+    'A',    # flake8-builtins
+    'C4',   # flake8-comprehensions
+    'EM',   # flake8-errmsg
+    'ICN',  # flake8-import-conventions
+    'PIE',  # flake8-pie
+    'T20',  # flake8-print
+    'SIM',  # flake8-simplify
+    'PD',   # pandas-vet
+    'NPY',  # numpy-specific-rules
+]
+ignore = ['D211', 'D213', 'D400', 'ANN101', 'ANN204', 'PD901']
 
 [tool.ruff.format]
 quote-style = "single"
