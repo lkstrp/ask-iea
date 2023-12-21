@@ -1,13 +1,16 @@
 """DOCSTRING."""
+import time
 import uuid
 
 import langchain.vectorstores
+import openai
 import pandas as pd
 from langchain.document_loaders import PyPDFLoader
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 from .utils.logger import Logger
+from .utils.utils import batch
 
 # Define a logger
 log = Logger(__name__)
@@ -76,10 +79,8 @@ class VectorStore(langchain.vectorstores.FAISS):
 
         # Drop all documents that are already in the vectorstore (from unique_docs and unique_ids)
         try:
-            for idx, doc_id in enumerate(unique_ids):
-                if doc_id in self.docstore._dict:
-                    unique_docs.pop(idx)
-                    unique_ids.pop(idx)
+            unique_docs = [doc for idx, doc in enumerate(unique_docs) if unique_ids[idx] not in self.docstore._dict]
+            unique_ids = [doc_id for doc_id in unique_ids if doc_id not in self.docstore._dict]
         except AttributeError:
             pass
 
@@ -94,4 +95,12 @@ class VectorStore(langchain.vectorstores.FAISS):
         """DOCSTRING."""
         docs, ids = self._load_index(index_df)
         if len(docs) > 0:
-            self.add_documents(docs, ids=ids)
+            # Loop over documents in batches to handle potential rate limit errors
+            for batch_docs, batch_ids in zip(batch(docs, 100), batch(ids, 100)):
+                while True:
+                    try:
+                        self.add_documents(batch_docs, ids=batch_ids)
+                        break
+                    except openai.RateLimitError:
+                        log.warning('Rate limit reached. Waiting 5 seconds before trying again.')
+                        time.sleep(5)
