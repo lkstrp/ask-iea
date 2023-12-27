@@ -2,6 +2,7 @@
 from pathlib import Path
 
 from .chains import (
+    chain_check_for_scope,
     chain_get_reports_from_question,
     chain_get_reports_from_scope,
     chain_qa,
@@ -64,10 +65,12 @@ def update_db(first_n: int = 150) -> None:
     db.save_local(PATH_FAISS_STORE)
 
 
-def get_relevant_reports(question: str, scope: str, num_reports: int) -> list:
+def get_relevant_reports(question: str, num_reports: int) -> list:
     """TODO DOCSTRING."""
-    if scope:
-        log.debug('Scope in question found. Using only reports from scope.')
+    scope = chain_check_for_scope.invoke({'question': question})
+
+    if scope.lower() not in ['none']:
+        log.debug(f'Scope found: "{scope}"')
         report_indices = chain_get_reports_from_scope.invoke(
             {
                 'scope': scope,
@@ -91,26 +94,26 @@ def get_relevant_reports(question: str, scope: str, num_reports: int) -> list:
     return report_indices
 
 
-def retrieve_docs(question: str, filter_dict: dict) -> list:
+def retrieve_docs(question: str, filter_dict: dict, n_docs: int = 5) -> list:
     """TODO DOCSTRING."""
     global db
 
-    retriever = db.as_retriever(search_kwargs={'k': 6, 'filter': filter_dict})
+    retriever = db.as_retriever(search_kwargs={'k': n_docs, 'filter': filter_dict})
     docs = retriever.invoke(question)
     log.debug(f'Retrieved {len(docs)} documents from DB.')
 
     return docs
 
 
-def ask(question: str, scope: str, num_reports: int = 100) -> None:
+def ask(question: str, num_reports: int = 100) -> None:
     """TODO DOCSTRING."""
     global db
 
-    log.debug(f'question: "{question}", scope: "{scope}", num_reports: "{num_reports}"')
-    report_indices = get_relevant_reports(question, scope=scope, num_reports=num_reports)
-    report_ids = df_index.loc[report_indices, 'report_id'].tolist()
+    log.debug(f'question: "{question}", num_reports: "{num_reports}"')
+    report_indices = get_relevant_reports(question, num_reports=num_reports)
+    report_ids = df_index.loc[report_indices, 'report_id'].tolist()[:1]  # TODO: Support checking multiple reports
 
-    filter_dict = {'where': {'report_id': report_ids[0]}}
+    filter_dict = {'report_id': report_ids[0]}  # TODO: Support checking multiple reports
     docs = retrieve_docs(question, filter_dict)
 
     relevant_docs = []
@@ -156,8 +159,10 @@ def ask(question: str, scope: str, num_reports: int = 100) -> None:
         final_answer = f'Answer:\n{total_sum_out}\n\n\n{format_for_print(relevant_docs)}'
 
     else:
-        final_answer = 'Could not find any relevant references.\n\nChecked the following reports:\n'
-        for report_id in report_ids:
-            final_answer += f'\t- {report_id}\n'
+        final_answer = 'Could not find any relevant references.'
+
+    final_answer += '\n\nChecked the following reports:\n'
+    for report_id in report_ids:
+        final_answer += f'\t- {report_id}\n'
 
     print(final_answer)

@@ -3,7 +3,6 @@ from langchain.chat_models import ChatOpenAI
 from langchain.output_parsers import OutputFixingParser
 from langchain.output_parsers.json import SimpleJsonOutputParser
 from langchain.output_parsers.list import CommaSeparatedListOutputParser
-from langchain.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 
 from .prompts import (
@@ -13,6 +12,7 @@ from .prompts import (
     prompt_qa,
     prompt_retrieve_keywords,
     prompt_retrieve_keywords_fix,
+    prompt_retrieve_reports_list_fix,
     prompt_summarize,
 )
 from .utils.logger import Logger
@@ -23,11 +23,9 @@ log = Logger(__name__)
 # -----
 # Index preprocessing
 # -----
-
-# Retrieve keywords: Used to get the abstract information in the index more concisely
 chain_retrieve_keywords = (
     prompt_retrieve_keywords
-    | ChatOpenAI()
+    | ChatOpenAI(model='gpt-3.5-turbo', temperature=0)
     | OutputFixingParser(
         parser=SimpleJsonOutputParser(),
         prompt=prompt_retrieve_keywords_fix,
@@ -40,16 +38,12 @@ chain_retrieve_keywords = (
 # -----
 
 # Get scope of question, if any report is referenced explicitly
-chain_check_for_scope = prompt_check_for_scope | ChatOpenAI(model='gpt-4')
-prompt_retrieve_reports_list_fix = PromptTemplate(
-    input_variables=[],
-    template='Please only return a list of keys, separated by commas. Do not return any other information. ',
-)
+chain_check_for_scope = prompt_check_for_scope | ChatOpenAI(model='gpt-4', temperature=0) | StrOutputParser()
 
 # If scope is given in question, get the corresponding reports
 chain_get_reports_from_scope = (
     prompt_get_reports_from_scope
-    | ChatOpenAI(model='gpt-3.5-turbo')
+    | ChatOpenAI(model='gpt-3.5-turbo', temperature=0)
     | OutputFixingParser(
         parser=CommaSeparatedListOutputParser(),
         prompt=prompt_retrieve_reports_list_fix,
@@ -60,7 +54,7 @@ chain_get_reports_from_scope = (
 # If no scope is given in question, get the 10 most relevant reports for the question
 chain_get_reports_from_question = (
     prompt_get_reports_from_question
-    | ChatOpenAI(model='gpt-3.5-turbo')
+    | ChatOpenAI(model='gpt-3.5-turbo', temperature=0)
     | OutputFixingParser(
         parser=CommaSeparatedListOutputParser(),
         prompt=prompt_retrieve_reports_list_fix,
@@ -69,8 +63,7 @@ chain_get_reports_from_question = (
 )
 
 # -----
-# chain = summary_prompt | llm | StrOutputParser()
+# Question answering
 # -----
-chain_summarize = prompt_summarize | ChatOpenAI(model='gpt-3.5-turbo') | StrOutputParser()
-
-chain_qa = prompt_qa | ChatOpenAI(model='gpt-3.5-turbo') | StrOutputParser()
+chain_summarize = prompt_summarize | ChatOpenAI(model='gpt-3.5-turbo', temperature=0) | StrOutputParser()
+chain_qa = prompt_qa | ChatOpenAI(model='gpt-3.5-turbo', temperature=0) | StrOutputParser()

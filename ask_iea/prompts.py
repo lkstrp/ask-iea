@@ -23,6 +23,7 @@ prompt_retrieve_keywords = PromptTemplate(
     'Date Published: {date_published}\n'
     'Abstract: {abstract}',
 )
+# Fix output
 prompt_retrieve_keywords_fix = PromptTemplate(
     input_variables=[],
     template='Please provide a dict as output, with the keys: keywords, year. Only return the dict. Nothing else. '
@@ -71,14 +72,21 @@ prompt_get_reports_from_question = PromptTemplate(
     'Reports: \n - {reports}\n\n',
 )
 
+# Fix output
+prompt_retrieve_reports_list_fix = PromptTemplate(
+    input_variables=[],
+    template='Please only return a list of keys, separated by commas. Do not return any other information. ',
+)
+
 # -----
-#
+# Question answering
 # -----
 prompt_summarize = PromptTemplate(
     input_variables=['text', 'report', 'question', 'summary_length'],
     template='Summarize the text below to help answer a question. '
-    'Do not directly answer the question, instead summarize '
-    'to give evidence to help answer the question. But only provide information that is relevant for the question. '
+    'Do not directly answer the question, instead summarize to give evidence to help answer the question. '
+    'Only provide information that is relevant for the question. '
+    'Also do not cite the question or mention it in any way. Act as if you would not know the question. '
     'Focus on specific details, including numbers, equations, or specific quotes. '
     'Reply "Not applicable" if text is irrelevant. '
     'Use {summary_length}.'
