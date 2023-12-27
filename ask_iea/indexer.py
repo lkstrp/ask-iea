@@ -1,4 +1,4 @@
-"""DOCSTRING."""
+"""TODO DOCSTRING."""
 import itertools
 
 import numpy as np
@@ -14,10 +14,10 @@ log = Logger(__name__)
 
 class ReportIndexer:
 
-    """DOCSTRING."""
+    """TODO DOCSTRING."""
 
     def __init__(self, path_df: str = None) -> None:
-        """DOCSTRING."""
+        """TODO DOCSTRING."""
         if path_df is None:
             self.df = pd.DataFrame(columns=['url_report', 'title', 'abstract', 'date_published', 'url_pdf'])
             self.df.index.name = 'report_id'
@@ -26,7 +26,7 @@ class ReportIndexer:
 
     @staticmethod
     def scrape_report_information(url_report: str) -> dict:
-        """DOCSTRING."""
+        """TODO DOCSTRING."""
         response = requests.get(url_report)
         if response.status_code != 200:
             msg = f'Failed to load page. Status code: {response.status_code}. URL: {url_report}.'
@@ -75,7 +75,7 @@ class ReportIndexer:
     def index_generator(
         self, already_scraped_urls: list = None, pages: [int] = None, break_after_n_pages: int = 1
     ) -> dict:
-        """DOCSTRING."""
+        """TODO DOCSTRING."""
         if already_scraped_urls is None:
             already_scraped_urls = []
 
@@ -132,7 +132,7 @@ class ReportIndexer:
                 yield report_data
 
     def add_new_reports(self, n_newest: int = 10, pages: [int] = None, break_after_n_pages: int = 1) -> None:
-        """DOCSTRING."""
+        """TODO DOCSTRING."""
         index_generator = self.index_generator(
             already_scraped_urls=self.df['url_report'].tolist(), pages=pages, break_after_n_pages=break_after_n_pages
         )
@@ -144,5 +144,5 @@ class ReportIndexer:
             self.df.loc[report_id] = report
 
     def save_to_file(self, filename: str) -> None:
-        """DOCSTRING."""
+        """TODO DOCSTRING."""
         self.df.to_csv(filename, index_label='report_id')

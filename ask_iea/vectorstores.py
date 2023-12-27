@@ -1,4 +1,4 @@
-"""DOCSTRING."""
+"""TODO DOCSTRING."""
 import time
 import uuid
 
@@ -18,10 +18,10 @@ log = Logger(__name__)
 
 class VectorStore(langchain.vectorstores.FAISS):
 
-    """DOCSTRING."""
+    """TODO DOCSTRING."""
 
-    def __init__(self, db_path:str=None, index_df:pd.DataFrame=None):
-        """DOCSTRING."""
+    def __init__(self, db_path: str = None, index_df: pd.DataFrame = None):
+        """TODO DOCSTRING."""
         if index_df is None and db_path is None:
             msg = 'Either index_df or db_path must be given.'
             raise ValueError(msg)
@@ -38,8 +38,7 @@ class VectorStore(langchain.vectorstores.FAISS):
 
     def _load_index(self, index_df: pd.DataFrame) -> (list, list):
         # Only load reports that have a PDF file
-        needs_load = index_df[index_df['url_pdf'].notna()]
-
+        needs_load = index_df[index_df['url_pdf'].notna() & index_df['_keywords'].notna()]
         try:
             db_sources = [doc.metadata['source'] for doc in self.docstore._dict.values()]
             needs_load = needs_load[~needs_load['url_pdf'].isin(db_sources)]
@@ -58,6 +57,8 @@ class VectorStore(langchain.vectorstores.FAISS):
                 page.metadata['title'] = row.title
                 page.metadata['abstract'] = row.abstract
                 page.metadata['date_published'] = row.date_published
+                page.metadata['_year'] = row._year
+                page.metadata['_keywords'] = row._keywords
             documents.extend(doc_pages)
 
         log.debug(f'\tLoaded {len(documents)} pages from {len(needs_load)} reports.')
@@ -92,7 +93,7 @@ class VectorStore(langchain.vectorstores.FAISS):
         return unique_docs, unique_ids
 
     def add_new_reports(self, index_df: pd.DataFrame) -> None:
-        """DOCSTRING."""
+        """TODO DOCSTRING."""
         docs, ids = self._load_index(index_df)
         if len(docs) > 0:
             # Loop over documents in batches to handle potential rate limit errors
