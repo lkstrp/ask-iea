@@ -17,8 +17,15 @@ from .vectorstores import VectorStore
 # Define a logger
 log = Logger(__name__)
 
-indexer = ReportIndexer() if not PATH_REPORTS_INDEX.exists() else ReportIndexer(PATH_REPORTS_INDEX)
-db = VectorStore(index_df=indexer.df[:1]) if not PATH_FAISS_STORE.exists() else VectorStore(db_path=PATH_FAISS_STORE)
+if PATH_REPORTS_INDEX.exists():
+    indexer = ReportIndexer(PATH_REPORTS_INDEX)
+else:
+    indexer = ReportIndexer()
+    indexer.add_new_reports(10)
+if PATH_FAISS_STORE.exists():
+    db = VectorStore(db_path=PATH_FAISS_STORE)
+else:
+    db = VectorStore(index_df=indexer.df)
 
 df_index = indexer.df[indexer.df['url_pdf'].notna() & indexer.df['_keywords'].notna()]
 df_index = df_index.reset_index()
@@ -64,6 +71,10 @@ def update_db(first_n: int = 150) -> None:
     db.add_new_reports(indexer.df[:first_n])
     db.save_local(PATH_FAISS_STORE)
 
+def update(first_n: int = 50) -> None:
+    """TODO DOCSTRING."""
+    update_index(n_newest=first_n)
+    update_db(first_n=first_n)
 
 def get_relevant_reports(question: str, num_reports: int) -> list:
     """TODO DOCSTRING."""
@@ -105,15 +116,15 @@ def retrieve_docs(question: str, filter_dict: dict, n_docs: int = 5) -> list:
     return docs
 
 
-def ask(question: str, num_reports: int = 100) -> None:
+def ask(question: str, num_reports: int = 100) -> str:
     """TODO DOCSTRING."""
     global db
 
     log.debug(f'question: "{question}", num_reports: "{num_reports}"')
     report_indices = get_relevant_reports(question, num_reports=num_reports)
-    report_ids = df_index.loc[report_indices, 'report_id'].tolist()[:1]  # TODO: Support checking multiple reports
+    report_ids = df_index.loc[report_indices, 'report_id'].tolist()
 
-    filter_dict = {'report_id': report_ids[0]}  # TODO: Support checking multiple reports
+    filter_dict = {'report_id': report_ids}
     docs = retrieve_docs(question, filter_dict)
 
     relevant_docs = []
@@ -163,6 +174,7 @@ def ask(question: str, num_reports: int = 100) -> None:
 
     final_answer += '\n\nChecked the following reports:\n'
     for report_id in report_ids:
-        final_answer += f'\t- {report_id}\n'
+        report_name = df_index[df_index.report_id == report_id].title.values[0]
+        final_answer += f'\t- {report_name}\n'
 
-    print(final_answer)
+    return final_answer

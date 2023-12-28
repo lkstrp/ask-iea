@@ -1,6 +1,7 @@
 """TODO DOCSTRING."""
 import time
 import uuid
+from pathlib import Path
 
 import langchain.vectorstores
 import openai
@@ -20,7 +21,7 @@ class VectorStore(langchain.vectorstores.FAISS):
 
     """TODO DOCSTRING."""
 
-    def __init__(self, db_path: str = None, index_df: pd.DataFrame = None):
+    def __init__(self, db_path: Path = None, index_df: pd.DataFrame = None):
         """TODO DOCSTRING."""
         if index_df is None and db_path is None:
             msg = 'Either index_df or db_path must be given.'
@@ -39,6 +40,8 @@ class VectorStore(langchain.vectorstores.FAISS):
     def _load_index(self, index_df: pd.DataFrame) -> (list, list):
         # Only load reports that have a PDF file
         needs_load = index_df[index_df['url_pdf'].notna() & index_df['_keywords'].notna()]
+        if needs_load.empty:
+            needs_load = index_df[index_df['url_pdf'].notna()]
         try:
             db_sources = [doc.metadata['source'] for doc in self.docstore._dict.values()]
             needs_load = needs_load[~needs_load['url_pdf'].isin(db_sources)]

@@ -19,7 +19,7 @@ class ReportIndexer:
     def __init__(self, path_df: str = None) -> None:
         """TODO DOCSTRING."""
         if path_df is None:
-            self.df = pd.DataFrame(columns=['url_report', 'title', 'abstract', 'date_published', 'url_pdf'])
+            self.df = pd.DataFrame(columns=['url_report', 'title', 'abstract', 'date_published', 'url_pdf', '_year', '_keywords'])
             self.df.index.name = 'report_id'
         else:
             self.df = pd.read_csv(path_df, index_col='report_id')
