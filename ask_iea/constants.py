@@ -1,4 +1,5 @@
-"""TODO DOCSTRING."""
+"""Path constants which are used.
+"""
 
 from pathlib import Path
 

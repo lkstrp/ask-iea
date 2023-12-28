@@ -1,4 +1,5 @@
-"""TODO DOCSTRING."""
+"""This file contains all prompts used in the ask_iea project. Change the prompts here if necessary.
+"""
 from langchain.prompts import PromptTemplate
 
 from .utils.logger import Logger

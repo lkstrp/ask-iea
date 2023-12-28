@@ -1,4 +1,6 @@
-"""TODO DOCSTRING."""
+"""Module which contains the vectorstore class, which is used as the underlying database.
+"""
+
 import time
 import uuid
 from pathlib import Path
@@ -19,10 +21,9 @@ log = Logger(__name__)
 
 class VectorStore(langchain.vectorstores.FAISS):
 
-    """TODO DOCSTRING."""
+    """Class to store vectors of documents. It is a wrapper around langchain.vectorstores.FAISS."""
 
     def __init__(self, db_path: Path = None, index_df: pd.DataFrame = None):
-        """TODO DOCSTRING."""
         if index_df is None and db_path is None:
             msg = 'Either index_df or db_path must be given.'
             raise ValueError(msg)
@@ -96,7 +97,12 @@ class VectorStore(langchain.vectorstores.FAISS):
         return unique_docs, unique_ids
 
     def add_new_reports(self, index_df: pd.DataFrame) -> None:
-        """TODO DOCSTRING."""
+        """Add new reports to the vectorstore.
+
+        Args:
+        ----
+            index_df: DataFrame with the reports to be added.
+        """
         docs, ids = self._load_index(index_df)
         if len(docs) > 0:
             # Loop over documents in batches to handle potential rate limit errors

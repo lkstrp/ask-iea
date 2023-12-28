@@ -1,4 +1,5 @@
-"""TODO DOCSTRING."""
+"""Contains the chains used for the different tasks.
+"""
 from langchain.chat_models import ChatOpenAI
 from langchain.output_parsers import OutputFixingParser
 from langchain.output_parsers.json import SimpleJsonOutputParser
@@ -65,5 +66,5 @@ chain_get_reports_from_question = (
 # -----
 # Question answering
 # -----
-chain_summarize = prompt_summarize | ChatOpenAI(model='gpt-3.5-turbo', temperature=0) | StrOutputParser()
-chain_qa = prompt_qa | ChatOpenAI(model='gpt-3.5-turbo', temperature=0) | StrOutputParser()
+chain_summarize = prompt_summarize | ChatOpenAI(model='gpt-4', temperature=0) | StrOutputParser()
+chain_qa = prompt_qa | ChatOpenAI(model='gpt-4', temperature=0) | StrOutputParser()

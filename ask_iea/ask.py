@@ -1,4 +1,5 @@
-"""TODO DOCSTRING."""
+"""Manages the full pipeline of ask-iea.
+"""
 from pathlib import Path
 
 from .chains import (
@@ -52,7 +53,12 @@ def _add_keywords_to_index(first_n: int = None) -> None:
 
 
 def update_index(n_newest: int = 150) -> None:
-    """TODO DOCSTRING."""
+    """Update the index with new reports.
+
+    Args:
+    ----
+        n_newest (int, optional): Number of newest reports to add. Defaults to 150.
+    """
     global indexer
 
     # Update the index with new reports
@@ -65,19 +71,41 @@ def update_index(n_newest: int = 150) -> None:
 
 
 def update_db(first_n: int = 150) -> None:
-    """TODO DOCSTRING."""
+    """Update the database with new reports.
+
+    Args:
+    ----
+        first_n: Number of newest reports to add. Defaults to 150.
+    """
     global db
 
     db.add_new_reports(indexer.df[:first_n])
     db.save_local(PATH_FAISS_STORE)
 
+
 def update(first_n: int = 50) -> None:
-    """TODO DOCSTRING."""
+    """Update both the index and the database with new reports.
+
+    Args:
+    ----
+        first_n: Number of newest reports to add. Defaults to 50.
+    """
     update_index(n_newest=first_n)
     update_db(first_n=first_n)
 
+
 def get_relevant_reports(question: str, num_reports: int) -> list:
-    """TODO DOCSTRING."""
+    """Get the most relevant reports for a question.
+
+    Args:
+    ----
+        question: Question to ask.
+        num_reports:  Number of reports to return.
+
+    Returns:
+    -------
+        list: List of report indices.
+    """
     scope = chain_check_for_scope.invoke({'question': question})
 
     if scope.lower() not in ['none']:
@@ -106,7 +134,18 @@ def get_relevant_reports(question: str, num_reports: int) -> list:
 
 
 def retrieve_docs(question: str, filter_dict: dict, n_docs: int = 5) -> list:
-    """TODO DOCSTRING."""
+    """Retrieve documents from the database.
+
+    Args:
+    ----
+        question: Question which is asked.
+        filter_dict: Dictionary with filters for the database.
+        n_docs: Number of documents to return.
+
+    Returns:
+    -------
+        list: List of documents.
+    """
     global db
 
     retriever = db.as_retriever(search_kwargs={'k': n_docs, 'filter': filter_dict})
@@ -117,7 +156,17 @@ def retrieve_docs(question: str, filter_dict: dict, n_docs: int = 5) -> list:
 
 
 def ask(question: str, num_reports: int = 100) -> str:
-    """TODO DOCSTRING."""
+    """Ask a question and return the answer. Runs the full pipeline.
+
+    Args:
+    ----
+        question: Question to ask.
+        num_reports: Number of reports which are taken into account.
+
+    Returns:
+    -------
+        str: Answer to the question.
+    """
     global db
 
     log.debug(f'question: "{question}", num_reports: "{num_reports}"')
@@ -147,7 +196,16 @@ def ask(question: str, num_reports: int = 100) -> str:
         )
 
     def format_for_print(relevant_docs_: list) -> str:
-        """TODO DOCSTRING."""
+        """Format the docs for printing.
+
+        Args:
+        ----
+            relevant_docs_ (list): List of relevant documents.
+
+        Returns:
+        -------
+            str: Formatted string.
+        """
         total_string = 'Sources:\n\n'
         for doc_ in relevant_docs_:
             string = (

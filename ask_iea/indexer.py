@@ -1,4 +1,6 @@
-"""TODO DOCSTRING."""
+"""Module to index reports from the IEA page.
+"""
+
 import itertools
 
 import numpy as np
@@ -14,19 +16,29 @@ log = Logger(__name__)
 
 class ReportIndexer:
 
-    """TODO DOCSTRING."""
+    """Class to index reports from the IEA Analysis page and each report's metadata."""
 
     def __init__(self, path_df: str = None) -> None:
-        """TODO DOCSTRING."""
         if path_df is None:
-            self.df = pd.DataFrame(columns=['url_report', 'title', 'abstract', 'date_published', 'url_pdf', '_year', '_keywords'])
+            self.df = pd.DataFrame(
+                columns=['url_report', 'title', 'abstract', 'date_published', 'url_pdf', '_year', '_keywords']
+            )
             self.df.index.name = 'report_id'
         else:
             self.df = pd.read_csv(path_df, index_col='report_id')
 
     @staticmethod
     def scrape_report_information(url_report: str) -> dict:
-        """TODO DOCSTRING."""
+        """Scrape the title, abstract, date published and URL to the PDF file of a report with BeautifulSoup.
+
+        Args:
+        ----
+            url_report: URL to the report page.
+
+        Returns:
+        -------
+            dict: Dictionary with the report data.
+        """
         response = requests.get(url_report)
         if response.status_code != 200:
             msg = f'Failed to load page. Status code: {response.status_code}. URL: {url_report}.'
@@ -75,7 +87,18 @@ class ReportIndexer:
     def index_generator(
         self, already_scraped_urls: list = None, pages: [int] = None, break_after_n_pages: int = 1
     ) -> dict:
-        """TODO DOCSTRING."""
+        """Generator which yields the report metadata of all reports on the IEA Analysis page.
+
+        Args:
+        ----
+            already_scraped_urls: List of URLs which have already been scraped.
+            pages: List of page numbers to scrape. If None, all pages are scraped.
+            break_after_n_pages: Stop scraping after n pages, if no new reports have been found.
+
+        Returns:
+        -------
+            dict: Dictionary with the reports' metadata.
+        """
         if already_scraped_urls is None:
             already_scraped_urls = []
 
@@ -132,7 +155,14 @@ class ReportIndexer:
                 yield report_data
 
     def add_new_reports(self, n_newest: int = 10, pages: [int] = None, break_after_n_pages: int = 1) -> None:
-        """TODO DOCSTRING."""
+        """Add new reports to the index.
+
+        Args:
+        ----
+            n_newest: Number of newest reports to add to the index.
+            pages: List of page numbers to scrape. If None, all pages are scraped.
+            break_after_n_pages: Stop scraping after n pages, if no new reports have been found.
+        """
         index_generator = self.index_generator(
             already_scraped_urls=self.df['url_report'].tolist(), pages=pages, break_after_n_pages=break_after_n_pages
         )
@@ -144,5 +174,5 @@ class ReportIndexer:
             self.df.loc[report_id] = report
 
     def save_to_file(self, filename: str) -> None:
-        """TODO DOCSTRING."""
+        """Save the index to a CSV file."""
         self.df.to_csv(filename, index_label='report_id')
