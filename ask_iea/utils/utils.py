@@ -12,6 +12,7 @@ def batch(iterable: list, n: int) -> list:
     Returns:
     -------
         list: List of batches.
+
     """
     length = len(iterable)
     for ndx in range(0, length, n):

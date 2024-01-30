@@ -58,6 +58,7 @@ def update_index(n_newest: int = 150) -> None:
     Args:
     ----
         n_newest (int, optional): Number of newest reports to add. Defaults to 150.
+
     """
     global indexer
 
@@ -76,6 +77,7 @@ def update_db(first_n: int = 150) -> None:
     Args:
     ----
         first_n: Number of newest reports to add. Defaults to 150.
+
     """
     global db
 
@@ -89,6 +91,7 @@ def update(first_n: int = 50) -> None:
     Args:
     ----
         first_n: Number of newest reports to add. Defaults to 50.
+
     """
     update_index(n_newest=first_n)
     update_db(first_n=first_n)
@@ -105,6 +108,7 @@ def get_relevant_reports(question: str, num_reports: int) -> list:
     Returns:
     -------
         list: List of report indices.
+
     """
     scope = chain_check_for_scope.invoke({'question': question})
 
@@ -145,6 +149,7 @@ def retrieve_docs(question: str, filter_dict: dict, n_docs: int = 5) -> list:
     Returns:
     -------
         list: List of documents.
+
     """
     global db
 
@@ -166,6 +171,7 @@ def ask(question: str, num_reports: int = 100) -> str:
     Returns:
     -------
         str: Answer to the question.
+
     """
     global db
 
@@ -205,6 +211,7 @@ def ask(question: str, num_reports: int = 100) -> str:
         Returns:
         -------
             str: Formatted string.
+
         """
         total_string = 'Sources:\n\n'
         for doc_ in relevant_docs_:

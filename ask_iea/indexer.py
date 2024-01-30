@@ -38,6 +38,7 @@ class ReportIndexer:
         Returns:
         -------
             dict: Dictionary with the report data.
+
         """
         response = requests.get(url_report)
         if response.status_code != 200:
@@ -98,6 +99,7 @@ class ReportIndexer:
         Returns:
         -------
             dict: Dictionary with the reports' metadata.
+
         """
         if already_scraped_urls is None:
             already_scraped_urls = []
@@ -162,6 +164,7 @@ class ReportIndexer:
             n_newest: Number of newest reports to add to the index.
             pages: List of page numbers to scrape. If None, all pages are scraped.
             break_after_n_pages: Stop scraping after n pages, if no new reports have been found.
+
         """
         index_generator = self.index_generator(
             already_scraped_urls=self.df['url_report'].tolist(), pages=pages, break_after_n_pages=break_after_n_pages

@@ -102,6 +102,7 @@ class VectorStore(langchain.vectorstores.FAISS):
         Args:
         ----
             index_df: DataFrame with the reports to be added.
+
         """
         docs, ids = self._load_index(index_df)
         if len(docs) > 0:

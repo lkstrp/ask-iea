@@ -35,6 +35,7 @@ class FilterTimeTaker(logging.Filter):
         Returns:
         -------
             bool: Always returns True so that the log record is not filtered out.
+
         """
         try:
             last = self.last
@@ -129,6 +130,7 @@ class Logger(logging.Logger):
             file_level (str or int, optional): The log level for the file handler. Defaults to 'INFO'.
             path_all_logs (str, optional): If path is given, another file handler with the lowest log level (NOTSET)
                 will be added to the logger. This handler will write all logs to the given path. Defaults to None.
+
         """
         self.name = name
         super().__init__(self.name)
@@ -175,6 +177,7 @@ class Logger(logging.Logger):
         Args:
         ----
             new_log_file (str): The new path for the log file.
+
         """
         # Remove old file handler
         for handler in self.handlers:
@@ -197,6 +200,7 @@ class Logger(logging.Logger):
         Args:
         ----
             new_log_level (str or int): The new log level. Can be a string (e.g., 'DEBUG', 'INFO') or an integer (0-50).
+
         """
         level_name_to_level = {
             'CRITICAL': logging.CRITICAL,
@@ -274,6 +278,7 @@ class Logger(logging.Logger):
             password (str, optional): The password. Defaults to os.environ.get('MAILGUN_PASSWORD').
             level_num (int, optional): The log level. Defaults to 35.
             add_email_level (bool, optional): Whether to add the 'EMAIL' log level. Defaults to True.
+
         """
         if not to_addrs:
             msg = 'No recipient given. Please pass one as argument or set it as an environment variable.'
