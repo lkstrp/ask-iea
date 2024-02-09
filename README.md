@@ -1,11 +1,13 @@
 # ask-iea
 
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://ask-iea.streamlit.app)
 
 Retrieval-Augmented Generation (RAG) chatbot to retrieve information from the [IEA (International Energy Agency)](https://www.iea.org/) reports with citation. Build with [LangChain](https://www.langchain.com/) and [FAISS](https://github.com/facebookresearch/faiss).
 
-This is a prototype to play around and test the potential of an RAG approach. All publicly available IEA reports can be queried (own OpenAI API key required). A two-step system is used to identify and retrieve relevant sources, similar to [paperqa](https://github.com/whitead/paper-qa). The results are already quite promising, but there is a lot of room to try out different splitters, retrievers and prompts. GPT-4 leads to better results, but GPT-3 is used.
+This is a prototype to play around and test the potential of an RAG approach. All publicly available IEA reports can be queried (own OpenAI API key required). A two-step system is used to identify and retrieve relevant sources, similar to [paperqa](https://github.com/whitead/paper-qa). The results are already quite promising, but there is a lot of room to try out different splitters, retrievers and prompts. Parallelization has also not yet been implemented, which is why the response is slow. GPT-4 leads to better results, but GPT-3 is used.
 
+**Try the demo [here](https://ask-iea.streamlit.app/)!**
 
 ## Installation
 Just clone the repository and install the requirements.
